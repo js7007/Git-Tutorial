@@ -1,0 +1,68 @@
+sudo apt-get update
+
+sudo apt-get install ca-certificates curl gnupg2 lsb-release
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+
+설치
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+root 권한을 가지고 실행하는 것은 권장되지 않으므로, 사용자를 docker group에 포함
+
+sudo groupadd docker
+sudo usermod -aG docker $USER 또는 사용자 계정
+newgrp docker
+
+또는
+
+$ sudo usermod -aG docker $USER
+$ sudo su - $USER
+
+docker ps는 앞으로 자주 사용할 명령어 중 하나로, 현재 실행중인 모든 컨테이너 목록을 출력하라는 명령어
+
+
+
+$ docker -v
+Docker version 20.10.22, build 3a2c30b
+
+$ cat /etc/apt/sources.list.d/docker.list
+deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/ubuntu kinetic stable
+
+$ dpkg --get-selections | grep docker
+docker-ce                                       install
+docker-ce-cli                                   install
+docker-ce-rootless-extras                       install
+docker-compose-plugin                           install
+docker-scan-plugin                              install
+
+도커 패키지는 docker-engine 하나였다
+현재는 docker-ce와 docker-ce-cli 두 가지로 나눠져 있다. 
+ce는 커뮤니티 에디선Community Edition의 줄임말
+도커는 크게 도커 엔진과 클라이언트 구분
+도커 엔진은 서버로 동작하며, 시스템 상에 서비스로 등록
+도커 클라이언트는 사용자가 입력하는 docker 명령어
+명령어를 실행하면 클라이언트는 도커 서버에 명령을 전달하고, 명령은 전적으로 서버에서 처리
+도커 클라이언트로 외부의 도커 서버에 명령을 내리는 것도 가능
+이러한 아키텍처를 반영해 도커 엔진과 도커 클라이언트 패키지로 구분됨
+
+테스트
+sudo docker run hello-world
+
+------------------------------------
+
+$docker create -i -t --name centos7 centos:7
+
+docker run 명령어와 다르게, docker create 명령어는 컨테이너를 생성하기만 하고
+컨테이너 내부로 들어가지 않는다.(docker run 명령어는 컨테이너를 생성 한 뒤, 컨테이너에 들어감)
+
+docker start, docker attach 명령어를 통해 컨테이너를 시작한 뒤, 내부로 들어간다. 
+
+$docker start centos7 
+$docker attach centos7
+
+docker를 종료하기 위해서 Cntl+P,Q를 입력합니다. 
+exit과 다르게, 컨테이너를 정지시키지 않고 컨테이너를 빠져나온다. 
